@@ -1,4 +1,4 @@
-package ex3;
+package ex4;
 
 // Original source code: https://gist.github.com/amadamala/3cdd53cb5a6b1c1df540981ab0245479
 // Modified by Fernando Porrino Serrano for academic purposes.
@@ -18,6 +18,11 @@ public class HashTable {
         return this.INITIAL_SIZE;
     }
 
+    /***
+     * El siguiente metodo sirve para comprobar que no se realizen colisiones de informacion el un hashMap, ejecutandose hasta que no se realizen colisiones.
+     * @param key es el identificador unico para almacenar la informacion obtenida de la clase HasTableTest.
+     * @param value es el valor obtenido de la clase HasTableTest el cual esta enlazado con la clave unica.
+     */
     private void colision(String key, Object value){                   // MILLORA: Creacion del nuevo código en el que duplicamos el tamaño del hash para que no haya colisiones.
         INITIAL_SIZE=INITIAL_SIZE*2;
         HashEntry[] he = new HashEntry[INITIAL_SIZE];
@@ -37,11 +42,30 @@ public class HashTable {
         put(key,  value);
 
     }
+
+    /***
+     * El siguiente metodo añade informacion a un hashMap
+     * @param key es el identificador unico para cada hash.
+     * @param value almacena un valor para cada hash con la clave correspondiente.
+     */
     public void put(String key, Object value) {
         int hash = getHash(key);
         final HashEntry hashEntry = new HashEntry(key, value);
 
         if(entries[hash] == null) {
+            entries[hash] = hashEntry;
+            size++;                                                     // Aumentar el valor al size.
+        } else {
+            HashEntry temp = entries[hash];
+            if (temp.key == key){
+                temp.value= value;
+                entries[hash]=temp;
+            }else {
+                colision(key, value);
+            }
+        }
+
+        /*if(entries[hash] == null) {
             entries[hash] = hashEntry;
             size++; //ERROR: cada vez que comprobamos el hashEntry tenemos que aumentar su tamaño (hashSize)
 
@@ -58,11 +82,17 @@ public class HashTable {
             temp.next = hashEntry;
             hashEntry.prev = temp;
             size++;
-        }
+        }*/
     }
 
     /**
      * Returns 'null' if the element is not found.
+     */
+
+    /***
+     * El siguiente metodo obtiene cualquier valor de un hash map teniendo colisiones o no.
+     * @param key es el identificador unico para almacenar informacion obtenida de la clase HasTableTest.
+     * @return devuelve null si el elemento no se encuente.
      */
     public Object get(String key) {
         int hash = getHash(key);
@@ -77,13 +107,24 @@ public class HashTable {
         return null;
     }
 
-    //REFACCIÓ: como el siguiente codigo estaba repetido en diferentes metodos he realizado una extraccion de metodo para tenerlo en unmetodo a parte.
-    private HashEntry getHashEntry(String key, HashEntry temp) {
+
+
+    /***
+     * Este metodo recorre un hashMap para encontrar la clave pasada por parametro.
+     * @param key es el identificador unico para almacenar informacion obtenida de la clase HasTableTest.
+     * @param temp valor temporal de la informacion obtenida.
+     * @return  devuelve el valor obtenido recorriendo un HashMap
+     */
+    private HashEntry getHashEntry(String key, HashEntry temp) { //REFACCIÓ: como el siguiente codigo estaba repetido en diferentes metodos he realizado una extraccion de metodo para tenerlo en unmetodo a parte.
         while (!temp.key.equals(key))
             temp = temp.next;
         return temp;
     }
 
+    /***
+     * Este metodo elimina el hash indicado.
+     * @param key es el identificador unico para eliminar el hash indicado.
+     */
     public void drop(String key) {
         int hash = getHash(key);
         if(entries[hash] != null) {
